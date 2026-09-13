@@ -51,12 +51,25 @@ function MainApp() {
 
   // Sync with window hash or role
   useEffect(() => {
-    const hash = window.location.hash.replace('#', '');
-    if (hash) {
-      setCurrentView(hash);
-    } else if (role === 'guest' || !user) {
-      setCurrentView('landing');
-    }
+    const syncHash = () => {
+      const hash = window.location.hash.replace('#', '');
+
+      if (hash) {
+        setCurrentView(hash);
+      } else if (role === 'guest' || !user) {
+        setCurrentView('landing');
+      }
+    };
+
+    // Sync immediately
+    syncHash();
+
+    // Sync when browser back/forward changes the hash
+    window.addEventListener('hashchange', syncHash);
+
+    return () => {
+      window.removeEventListener('hashchange', syncHash);
+    };
   }, [role, user]);
 
   const handleNavigate = (view, params = {}) => {
