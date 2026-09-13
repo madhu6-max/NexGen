@@ -1,0 +1,28 @@
+# Dependencies (installed fresh inside the image via npm ci)
+node_modules
+**/node_modules
+
+# Local environment files and secrets (never bake into the image)
+.env
+.env.*
+!.env.example
+
+# Local databases (created/migrated at runtime, never from the host)
+*.db
+*.sqlite
+*.sqlite3
+
+# Host build artifacts (client dist is rebuilt inside the image)
+dist
+build
+
+# Version control
+.git
+.gitignore
+
+# Logs and editor/OS artifacts
+*.log
+.vscode
+.idea
+.DS_Store
+Thumbs.db
