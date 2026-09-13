@@ -27,6 +27,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const { initSchema } = require('./db/database');
+const { ensureReferenceData } = require('./db/referenceData');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -35,7 +36,10 @@ const PORT = process.env.PORT || 5000;
 // Environment-based CORS: no wildcard when a frontend origin is configured.
 // Always allows local Vite dev origins; additionally allows FRONTEND_URL when set.
 // Requests without an Origin header (health checks, server-to-server) pass through.
-const allowedOrigins = ['http://localhost:5173', 'http://127.0.0.1:5173'];
+const allowedOrigins = ['http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:5174',
+  'http://127.0.0.1:5174'];
 if (process.env.FRONTEND_URL) {
   allowedOrigins.push(process.env.FRONTEND_URL);
 }
@@ -113,17 +117,19 @@ app.use((err, req, res, next) => {
 });
 
 // Initialize database schema and start server
-initSchema().then(() => {
-  app.listen(PORT, () => {
-    console.log(`=======================================================`);
-    console.log(`🌱 AgriLink API Gateway successfully started on port ${PORT}`);
-    console.log(`   Health Check: http://localhost:${PORT}/api/health`);
-    console.log(`   Database: SQLite at server/agrilink.db`);
-    console.log(`   Demo Login: ${process.env.ENABLE_DEMO_LOGIN === 'true' ? '✅ ENABLED' : '❌ DISABLED'}`);
-    console.log(`   JWT Auth: ✅ ACTIVE`);
-    console.log(`=======================================================`);
+initSchema()
+  .then(() => ensureReferenceData())
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`=======================================================`);
+      console.log(`🌱 AgriLink API Gateway successfully started on port ${PORT}`);
+      console.log(`   Health Check: http://localhost:${PORT}/api/health`);
+      console.log(`   Database: SQLite at server/agrilink.db`);
+      console.log(`   Demo Login: ${process.env.ENABLE_DEMO_LOGIN === 'true' ? '✅ ENABLED' : '❌ DISABLED'}`);
+      console.log(`   JWT Auth: ✅ ACTIVE`);
+      console.log(`=======================================================`);
+    });
+  }).catch(err => {
+    console.error('Failed to initialize server schema:', err);
+    process.exit(1);
   });
-}).catch(err => {
-  console.error('Failed to initialize server schema:', err);
-  process.exit(1);
-});
