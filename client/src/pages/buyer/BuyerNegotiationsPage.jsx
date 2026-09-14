@@ -6,7 +6,7 @@ import { CheckoutModal } from '../../components/common/CheckoutModal';
 import {
   Handshake, CheckCircle2, ArrowRight, ShieldCheck,
   Scale, DollarSign, Calendar, MapPin, Send, AlertCircle, Sparkles,
-  Clock, CreditCard
+  Clock, CreditCard, Lock
 } from 'lucide-react';
 
 export const BuyerNegotiationsPage = ({ onNavigate }) => {
